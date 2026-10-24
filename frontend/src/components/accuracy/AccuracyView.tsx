@@ -184,8 +184,8 @@ export const AccuracyView: React.FC<AccuracyViewProps> = ({
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* KPI Cards (Adaptive Responsive Grid for All Zoom Levels) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5 sm:gap-4">
         <KpiCard
           title="MAE (Mean Absolute Error)"
           value={formatMW(s.mae_mw)}

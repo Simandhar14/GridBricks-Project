@@ -109,3 +109,4 @@ sequenceDiagram
 ### D. Timezone & Look-Ahead Leakage Guarantee
 * **Decision:** All timestamps are internally parsed and stored as UTC-aware `datetime` objects. The D-1 cutoff logic explicitly applies `ZoneInfo("Europe/London")` on day $D - 1$.
 * **Trade-Off:** Because January is in Greenwich Mean Time (GMT), UTC offset is $+0$. However, using explicit London timezone objects guarantees that summer time transitions (BST) would not break the core domain logic if extended to other delivery months.
+

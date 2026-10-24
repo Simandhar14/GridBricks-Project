@@ -101,3 +101,4 @@
     3. Docker container build verification.
 * **Wrap-up Statement:**
   > "GridBricks delivers a production-ready, mathematically audited, high-performance platform for UK power procurement desks. Clean code, zero look-ahead leakage, and trader-focused utility."
+

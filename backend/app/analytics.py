@@ -239,6 +239,29 @@ def compute_empirical_error_quantiles(
     }
 
 
+def expand_hourly_to_half_hourly(forecasts_df: pd.DataFrame) -> pd.DataFrame:
+    """Expand hourly WINDFOR forecasts (published at :00) to half-hourly settlement periods.
+
+    Elexon BMRS WINDFOR is published at 60-minute resolution (on the hour :00).
+    In UK day-ahead wholesale trading, each hourly forecast applies across both
+    half-hour settlement periods of that hour (e.g. 00:00 forecast covers 00:00–00:30
+    and 00:30–01:00). If forecasts already contain :30 timestamps, they are preserved.
+    """
+    if forecasts_df.empty:
+        return forecasts_df
+
+    # Check if :30 timestamps already exist
+    has_half_hours = (forecasts_df["start_time"].dt.minute == 30).any()
+    if has_half_hours:
+        return forecasts_df
+
+    # Duplicate :00 rows and shift start_time forward by 30 minutes
+    f_30 = forecasts_df.copy()
+    f_30["start_time"] = f_30["start_time"] + timedelta(minutes=30)
+    expanded = pd.concat([forecasts_df, f_30], ignore_index=True)
+    return expanded.sort_values(["start_time", "publish_time"]).reset_index(drop=True)
+
+
 def align_decision_and_actuals(
     actuals_df: pd.DataFrame,
     forecasts_df: pd.DataFrame,
@@ -249,14 +272,16 @@ def align_decision_and_actuals(
     """Align decision forecasts with actuals across a date range.
 
     Applies the decision cutoff day-by-day to strictly prevent look-ahead leakage.
+    Expands 60-min WINDFOR forecasts to both half-hourly settlement periods.
     """
+    expanded_f = expand_hourly_to_half_hourly(forecasts_df)
     s_date = parse_date(start_date)
     e_date = parse_date(end_date)
 
     decision_frames = []
     curr = s_date
     while curr <= e_date:
-        dec = filter_decision_forecasts(forecasts_df, curr, cutoff_time_local=cutoff_time_local)
+        dec = filter_decision_forecasts(expanded_f, curr, cutoff_time_local=cutoff_time_local)
         if not dec.empty:
             decision_frames.append(dec)
         curr += timedelta(days=1)
@@ -328,8 +353,9 @@ def build_daily_decision_view(
 
     expected_df = pd.DataFrame(expected_times, columns=["start_time", "settlement_period"])
 
-    # Decision forecasts
-    dec_df = filter_decision_forecasts(forecasts_df, d, cutoff_time_local=cutoff_time_local)
+    # Decision forecasts (with 60-min hourly blocks mapped to half-hours)
+    expanded_f = expand_hourly_to_half_hourly(forecasts_df)
+    dec_df = filter_decision_forecasts(expanded_f, d, cutoff_time_local=cutoff_time_local)
     dec_df = dec_df.rename(
         columns={
             "generation": "forecast_mw",
@@ -454,13 +480,14 @@ def compute_daily_accuracy(
     cutoff_time_local: str = "09:00",
 ) -> list[dict[str, Any]]:
     """Compute day-by-day accuracy metrics for GET /api/accuracy/daily."""
+    expanded_f = expand_hourly_to_half_hourly(forecasts_df)
     s_date = parse_date(start_date)
     e_date = parse_date(end_date)
 
     daily_results = []
     curr = s_date
     while curr <= e_date:
-        dec = filter_decision_forecasts(forecasts_df, curr, cutoff_time_local=cutoff_time_local)
+        dec = filter_decision_forecasts(expanded_f, curr, cutoff_time_local=cutoff_time_local)
         if not dec.empty:
             start_utc = datetime(curr.year, curr.month, curr.day, 0, 0, tzinfo=UTC)
             end_utc = start_utc + timedelta(days=1)

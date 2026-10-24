@@ -78,3 +78,4 @@ Do not procure against raw `WINDFOR` day-ahead forecasts. Throughout January 202
 ### 3. Leverage the GridBricks "What-If" Scenario Tool
 * Utilize the interactive What-If widget on the **Decision View** to dynamically stress-test portfolio residual purchase obligations against the empirical **P10 wind lower bound**.
 * If national demand is projected at 32,000 MW and wind is forecast at 10,000 MW, the baseline procurement need is 22,000 MW. The conservative requirement (P10 wind) is ~23,500 MW, indicating a **1,500 MW recommended buffer**.
+

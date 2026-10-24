@@ -57,7 +57,7 @@ export const WhatIfWidget: React.FC<WhatIfWidgetProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 items-stretch">
         {/* Demand Scenario Input */}
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1">

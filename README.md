@@ -237,3 +237,4 @@ heroku open --app gridbricks-wind-desk
 In compliance with project specifications, AI assistance was utilized during the development of this application:
 - **AI Tool:** **Google Antigravity AI Agent** (Advanced Agentic Coding Pair Programmer)
 - **Role:** Antigravity assisted with end-to-end architecture planning, pure analytics module implementation, test-driven development (TDD), React/Recharts component authoring, and multi-stage container optimization. All code and mathematical formulas were rigorously reviewed, linted, and tested against hand-computed fixtures.
+
