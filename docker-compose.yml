@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  # ── Production-Like Container (Single Origin, Single Container) ───────────────
+  # Run with: docker compose up app
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gridbricks-app:latest
+    container_name: gridbricks-prod
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - APP_ENV=production
+      - PORT=8000
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+
+  # ── Local Development: Fast Reload Backend ──────────────────────────────────
+  # Run with: docker compose --profile dev up
+  backend-dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: gridbricks-backend-dev
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=development
+      - PORT=8000
+      - LOG_LEVEL=DEBUG
+      - CORS_ORIGINS=http://localhost:5173
+
+  # ── Local Development: Vite Dev Server ──────────────────────────────────────
+  frontend-dev:
+    profiles: ["dev"]
+    image: node:20-alpine
+    container_name: gridbricks-frontend-dev
+    working_dir: /app/frontend
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend-dev
+

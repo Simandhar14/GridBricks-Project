@@ -1,0 +1,70 @@
+{
+  "fetch_time_utc": "2026-10-24T15:16:17.448303+00:00",
+  "endpoints": {
+    "actuals": "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream",
+    "forecasts": "https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream"
+  },
+  "params": {
+    "actuals": {
+      "settlementDateFrom": "2026-01-01",
+      "settlementDateTo": "2026-01-31",
+      "fuelType": "WIND"
+    },
+    "forecasts": {
+      "publishDateTimeFrom": "2025-12-28T00:00:00Z",
+      "publishDateTimeTo": "2026-01-31T23:59:59Z",
+      "post_filter_startTime_from": "2026-01-01T00:00:00Z",
+      "post_filter_startTime_to": "2026-01-31T23:30:00Z"
+    }
+  },
+  "row_counts": {
+    "actuals": 1488,
+    "forecasts": 18080
+  },
+  "quality": {
+    "actuals": {
+      "rows": 1488,
+      "unique_start_times": 1488,
+      "expected_half_hours": 1488,
+      "missing_half_hours_count": 0,
+      "missing_half_hours": [],
+      "negative_generation_rows": 0,
+      "null_generation_rows": 0
+    },
+    "forecasts": {
+      "rows": 18080,
+      "unique_start_times": 744,
+      "expected_half_hours": 1488,
+      "missing_start_times_count": 744,
+      "missing_start_times": [
+        "2026-01-01T00:30:00+00:00",
+        "2026-01-01T01:30:00+00:00",
+        "2026-01-01T02:30:00+00:00",
+        "2026-01-01T03:30:00+00:00",
+        "2026-01-01T04:30:00+00:00",
+        "2026-01-01T05:30:00+00:00",
+        "2026-01-01T06:30:00+00:00",
+        "2026-01-01T07:30:00+00:00",
+        "2026-01-01T08:30:00+00:00",
+        "2026-01-01T09:30:00+00:00",
+        "2026-01-01T10:30:00+00:00",
+        "2026-01-01T11:30:00+00:00",
+        "2026-01-01T12:30:00+00:00",
+        "2026-01-01T13:30:00+00:00",
+        "2026-01-01T14:30:00+00:00",
+        "2026-01-01T15:30:00+00:00",
+        "2026-01-01T16:30:00+00:00",
+        "2026-01-01T17:30:00+00:00",
+        "2026-01-01T18:30:00+00:00",
+        "2026-01-01T19:30:00+00:00"
+      ],
+      "negative_generation_rows": 0,
+      "null_generation_rows": 0,
+      "vintages_per_starttime": {
+        "min": 16.0,
+        "p50": 24.0,
+        "max": 32.0
+      }
+    }
+  }
+}
