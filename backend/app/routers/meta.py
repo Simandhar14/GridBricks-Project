@@ -89,3 +89,15 @@ def get_metadata() -> MetaResponse:
         data_quality=quality,
         actuals_coverage=coverage,
     )
+
+
+@router.post("/api/refresh")
+def reload_data() -> dict[str, Any]:
+    """Reload snapshot datasets into in-memory cache and return status."""
+    data_loader.load()
+    return {
+        "status": "success",
+        "message": "Snapshot data reloaded successfully",
+        "actuals_rows": len(data_loader.get_actuals()),
+        "forecast_rows": len(data_loader.get_forecasts()),
+    }

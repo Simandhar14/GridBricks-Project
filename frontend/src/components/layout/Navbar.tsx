@@ -1,5 +1,15 @@
 import React from 'react';
-import { Wind, BarChart3, History, HelpCircle, Activity } from 'lucide-react';
+import {
+  Wind,
+  BarChart3,
+  History,
+  HelpCircle,
+  Activity,
+  RefreshCw,
+  CheckCircle,
+  AlertTriangle,
+} from 'lucide-react';
+import { useDataRefresh } from '../../api/useDataRefresh';
 
 export type ViewTab = 'decision' | 'accuracy' | 'revisions';
 
@@ -14,6 +24,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectTab,
   onOpenMethodology,
 }) => {
+  const { isRefreshing, status, refreshData, dismissStatus } = useDataRefresh();
+
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,8 +89,54 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          {/* Actions: Refresh Data + Methodology */}
+          <div className="flex items-center gap-2.5">
+            {/* Status indicator (Success or Error notification) */}
+            {status.state === 'success' && status.lastUpdated && (
+              <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg animate-fade-in">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Updated {status.lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+              </span>
+            )}
+
+            {status.state === 'error' && (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium text-rose-800 bg-rose-50 border border-rose-200 rounded-lg shadow-xs">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                <span className="max-w-[180px] sm:max-w-xs truncate" title={status.message || 'Network error'}>
+                  {status.message || 'Network error'}
+                </span>
+                <button
+                  onClick={dismissStatus}
+                  className="text-rose-500 hover:text-rose-900 ml-1 text-xs font-bold leading-none cursor-pointer"
+                  title="Dismiss alert"
+                  aria-label="Dismiss error"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+
+            {/* Refresh Data Button */}
+            <button
+              onClick={refreshData}
+              disabled={isRefreshing}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border shadow-2xs transition-all ${
+                isRefreshing
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-wait'
+                  : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border-slate-300 active:scale-95 cursor-pointer'
+              }`}
+              title="Fetch latest data from Elexon feed & refresh all dashboard views"
+              aria-label="Refresh Data"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 shrink-0 ${
+                  isRefreshing ? 'animate-spin text-sky-600' : 'text-slate-500'
+                }`}
+              />
+              <span>{isRefreshing ? 'Refreshing...' : 'Refresh Data'}</span>
+            </button>
+
+            {/* Methodology Button */}
             <button
               onClick={onOpenMethodology}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors border border-transparent hover:border-slate-200"
