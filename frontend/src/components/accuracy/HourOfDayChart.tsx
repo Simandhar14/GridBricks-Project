@@ -12,12 +12,15 @@ import {
 } from 'recharts';
 import { HourlyAccuracyItem } from '../../types/api';
 import { formatMW, formatSignedMW } from '../../utils/formatters';
+import { useTheme } from '../../context/ThemeContext';
 
 interface HourOfDayChartProps {
   data: HourlyAccuracyItem[];
 }
 
 export const HourOfDayChart: React.FC<HourOfDayChartProps> = ({ data }) => {
+  const { isDark } = useTheme();
+
   const chartData = React.useMemo(() => {
     return data.map((h) => ({
       hourLabel: `${h.hour_utc.toString().padStart(2, '0')}:00`,
@@ -29,13 +32,13 @@ export const HourOfDayChart: React.FC<HourOfDayChartProps> = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
             Error by Hour of the Day (Diurnal Cycle)
           </h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Assessing daytime thermal vs. overnight wind forecast stability (UTC / London)
           </p>
         </div>
@@ -44,10 +47,19 @@ export const HourOfDayChart: React.FC<HourOfDayChartProps> = ({ data }) => {
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-            <XAxis dataKey="hourLabel" stroke="#94a3b8" fontSize={11} tickLine={false} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={isDark ? '#334155' : '#f1f5f9'}
+              vertical={false}
+            />
+            <XAxis
+              dataKey="hourLabel"
+              stroke={isDark ? '#64748b' : '#94a3b8'}
+              fontSize={11}
+              tickLine={false}
+            />
             <YAxis
-              stroke="#94a3b8"
+              stroke={isDark ? '#64748b' : '#94a3b8'}
               fontSize={11}
               tickLine={false}
               axisLine={false}

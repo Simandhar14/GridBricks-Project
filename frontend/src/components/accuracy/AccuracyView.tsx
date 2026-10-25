@@ -87,28 +87,28 @@ export const AccuracyView: React.FC<AccuracyViewProps> = ({
   return (
     <div className="space-y-6">
       {/* View Header & Date-Range Controls */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors duration-200">
         <div>
-          <h2 className="text-base font-bold text-slate-900 tracking-tight">
+          <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
             Decision-Time Forecast Accuracy & Risk Evaluation
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Benchmark forecast performance against confirmed FUELHH generation actuals
           </p>
         </div>
 
         {/* Date Range & Cutoff Filters */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700">
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
-            <label htmlFor="accuracy-start" className="font-medium text-slate-500">
+          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-300">
+            <Calendar className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+            <label htmlFor="accuracy-start" className="font-medium text-slate-500 dark:text-slate-400">
               Period:
             </label>
             <select
               id="accuracy-start"
               value={startDate}
               onChange={(e) => onChangeStartDate(e.target.value)}
-              className="bg-transparent font-semibold text-slate-900 focus:outline-none cursor-pointer"
+              className="bg-transparent font-semibold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-slate-100"
             >
               {availableDates.map((d) => (
                 <option key={d} value={d}>
@@ -116,12 +116,12 @@ export const AccuracyView: React.FC<AccuracyViewProps> = ({
                 </option>
               ))}
             </select>
-            <span className="text-slate-400">→</span>
+            <span className="text-slate-400 dark:text-slate-500">→</span>
             <select
               id="accuracy-end"
               value={endDate}
               onChange={(e) => onChangeEndDate(e.target.value)}
-              className="bg-transparent font-semibold text-slate-900 focus:outline-none cursor-pointer"
+              className="bg-transparent font-semibold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-slate-100"
             >
               {availableDates.map((d) => (
                 <option key={d} value={d}>
@@ -131,16 +131,16 @@ export const AccuracyView: React.FC<AccuracyViewProps> = ({
             </select>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700">
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
-            <label htmlFor="accuracy-cutoff" className="font-medium text-slate-500">
+          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-300">
+            <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+            <label htmlFor="accuracy-cutoff" className="font-medium text-slate-500 dark:text-slate-400">
               D-1 Cutoff:
             </label>
             <select
               id="accuracy-cutoff"
               value={selectedCutoff}
               onChange={(e) => onChangeCutoff(e.target.value)}
-              className="bg-transparent font-semibold text-slate-900 focus:outline-none cursor-pointer"
+              className="bg-transparent font-semibold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-slate-100"
             >
               {cutoffOptions.map((c) => (
                 <option key={c} value={c}>
@@ -153,33 +153,33 @@ export const AccuracyView: React.FC<AccuracyViewProps> = ({
       </div>
 
       {/* Trader Insight Callout Banner */}
-      <div className="bg-sky-50/80 border border-sky-200 rounded-xl p-4 sm:p-5 flex items-start gap-3.5">
-        <div className="p-2 rounded-lg bg-sky-100 text-sky-700 shrink-0 mt-0.5">
+      <div className="bg-sky-50/80 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/60 rounded-xl p-4 sm:p-5 flex items-start gap-3.5 transition-colors duration-200">
+        <div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 shrink-0 mt-0.5">
           <Lightbulb className="w-5 h-5" />
         </div>
-        <div className="text-xs text-sky-950 space-y-1">
-          <div className="font-bold text-sm tracking-tight text-sky-900">
+        <div className="text-xs text-sky-950 dark:text-sky-200 space-y-1">
+          <div className="font-bold text-sm tracking-tight text-sky-900 dark:text-sky-100">
             What This Means For Procurement & Trading
           </div>
           <p className="leading-relaxed">
             {isOverForecasting ? (
               <>
                 On average across the selected period, the decision-time forecast{' '}
-                <strong>over-predicts actual wind generation by {formatMW(Math.abs(biasVal))}</strong>{' '}
+                <strong className="text-sky-950 dark:text-white">over-predicts actual wind generation by {formatMW(Math.abs(biasVal))}</strong>{' '}
                 (positive bias). If procuring strictly against the raw forecast, your desk risks{' '}
-                <strong>under-contracting alternative generation</strong>.
+                <strong className="text-sky-950 dark:text-white">under-contracting alternative generation</strong>.
               </>
             ) : (
               <>
                 On average across the selected period, the decision-time forecast{' '}
-                <strong>under-predicts actual wind generation by {formatMW(Math.abs(biasVal))}</strong>{' '}
+                <strong className="text-sky-950 dark:text-white">under-predicts actual wind generation by {formatMW(Math.abs(biasVal))}</strong>{' '}
                 (negative bias).
               </>
             )}
           </p>
-          <p className="text-sky-800 font-medium">
+          <p className="text-sky-800 dark:text-sky-300 font-medium">
             💡 Practical Rule-of-Thumb: Maintain a reserve purchasing buffer of{' '}
-            <strong>~{formatMW(p90Val)}</strong> to cover forecast shortfall with ~90% empirical confidence.
+            <strong className="text-sky-950 dark:text-white">~{formatMW(p90Val)}</strong> to cover forecast shortfall with ~90% empirical confidence.
           </p>
         </div>
       </div>

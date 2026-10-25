@@ -66,12 +66,12 @@ export const DecisionView: React.FC<DecisionViewProps> = ({
   return (
     <div className="space-y-6">
       {/* View Header & Controls */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors duration-200">
         <div>
-          <h2 className="text-base font-bold text-slate-900 tracking-tight">
+          <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
             Day-Ahead Wind Forecast & Procurement Order Decision
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Strictly reflects information available before the D-1 auction cutoff with zero look-ahead leakage
           </p>
         </div>
@@ -79,16 +79,16 @@ export const DecisionView: React.FC<DecisionViewProps> = ({
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Date Picker */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700">
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
-            <label htmlFor="decision-date" className="font-medium text-slate-500">
+          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-300">
+            <Calendar className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+            <label htmlFor="decision-date" className="font-medium text-slate-500 dark:text-slate-400">
               Delivery Day:
             </label>
             <select
               id="decision-date"
               value={selectedDate}
               onChange={(e) => onChangeDate(e.target.value)}
-              className="bg-transparent font-semibold text-slate-900 focus:outline-none cursor-pointer"
+              className="bg-transparent font-semibold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-slate-100"
             >
               {availableDates.map((d) => (
                 <option key={d} value={d}>
@@ -99,16 +99,16 @@ export const DecisionView: React.FC<DecisionViewProps> = ({
           </div>
 
           {/* Cutoff Selector */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700">
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
-            <label htmlFor="decision-cutoff" className="font-medium text-slate-500">
+          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-300">
+            <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+            <label htmlFor="decision-cutoff" className="font-medium text-slate-500 dark:text-slate-400">
               D-1 Cutoff:
             </label>
             <select
               id="decision-cutoff"
               value={selectedCutoff}
               onChange={(e) => onChangeCutoff(e.target.value)}
-              className="bg-transparent font-semibold text-slate-900 focus:outline-none cursor-pointer"
+              className="bg-transparent font-semibold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-slate-100"
             >
               {cutoffOptions.map((c) => (
                 <option key={c} value={c}>

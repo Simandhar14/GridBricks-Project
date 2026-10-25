@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar, ViewTab } from './components/layout/Navbar';
 import { MethodologyDrawer } from './components/layout/MethodologyDrawer';
 import { DecisionView } from './components/decision/DecisionView';
@@ -24,7 +25,7 @@ export const AppContent: React.FC = () => {
   const [isMethodologyOpen, setIsMethodologyOpen] = useState<boolean>(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       <Navbar
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
@@ -67,8 +68,8 @@ export const AppContent: React.FC = () => {
         onClose={() => setIsMethodologyOpen(false)}
       />
 
-      <footer className="bg-white border-t border-slate-200 py-4 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-8 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
           <div>
             Data Source: <strong>Elexon BMRS</strong> (FUELHH & WINDFOR streams) • January 2026 Delivery
           </div>
@@ -84,7 +85,9 @@ export const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

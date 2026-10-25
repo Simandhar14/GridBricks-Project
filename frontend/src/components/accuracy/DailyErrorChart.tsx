@@ -12,12 +12,15 @@ import {
 } from 'recharts';
 import { DailyAccuracyItem } from '../../types/api';
 import { formatMW, formatSignedMW } from '../../utils/formatters';
+import { useTheme } from '../../context/ThemeContext';
 
 interface DailyErrorChartProps {
   data: DailyAccuracyItem[];
 }
 
 export const DailyErrorChart: React.FC<DailyErrorChartProps> = ({ data }) => {
+  const { isDark } = useTheme();
+
   const chartData = React.useMemo(() => {
     return data.map((d) => ({
       dateLabel: d.date.slice(5), // "01-15"
@@ -30,13 +33,13 @@ export const DailyErrorChart: React.FC<DailyErrorChartProps> = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
             Daily Forecast Error Trend
           </h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Day-by-day Mean Absolute Error (MAE), Bias, and P90 Tail Error
           </p>
         </div>
@@ -45,10 +48,19 @@ export const DailyErrorChart: React.FC<DailyErrorChartProps> = ({ data }) => {
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-            <XAxis dataKey="dateLabel" stroke="#94a3b8" fontSize={11} tickLine={false} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={isDark ? '#334155' : '#f1f5f9'}
+              vertical={false}
+            />
+            <XAxis
+              dataKey="dateLabel"
+              stroke={isDark ? '#64748b' : '#94a3b8'}
+              fontSize={11}
+              tickLine={false}
+            />
             <YAxis
-              stroke="#94a3b8"
+              stroke={isDark ? '#64748b' : '#94a3b8'}
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -62,8 +74,8 @@ export const DailyErrorChart: React.FC<DailyErrorChartProps> = ({ data }) => {
             <Bar
               dataKey="bias"
               name="Daily Bias (MW)"
-              fill="#94a3b8"
-              opacity={0.4}
+              fill={isDark ? '#475569' : '#94a3b8'}
+              opacity={0.6}
               radius={[3, 3, 0, 0]}
             />
             <Line
