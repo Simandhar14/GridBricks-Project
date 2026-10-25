@@ -1,0 +1,15 @@
+services:
+  # Single full-stack web service (Builds React frontend + runs FastAPI backend)
+  - type: web
+    name: gridbricks-wind-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: APP_ENV
+        value: production
+      - key: DATA_DIR
+        value: backend/data
