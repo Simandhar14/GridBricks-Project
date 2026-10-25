@@ -11,41 +11,68 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Helper to safely apply theme classes to DOM
+const applyThemeToDOM = (t: Theme) => {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  const body = document.body;
+
+  if (t === 'dark') {
+    root.classList.add('dark');
+    body?.classList.add('dark');
+    root.setAttribute('data-theme', 'dark');
+  } else {
+    root.classList.remove('dark');
+    body?.classList.remove('dark');
+    root.setAttribute('data-theme', 'light');
+  }
+};
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
-    // 1. Check local storage
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('gridbricks_theme');
-      if (stored === 'light' || stored === 'dark') {
-        return stored;
+      try {
+        const stored = localStorage.getItem('gridbricks_theme');
+        if (stored === 'light' || stored === 'dark') {
+          applyThemeToDOM(stored);
+          return stored;
+        }
+      } catch {
+        // Local storage unavailable (private browsing / iframe sandboxing)
       }
-      // 2. Check system preference
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
+
+      try {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          applyThemeToDOM('dark');
+          return 'dark';
+        }
+      } catch {
+        // matchMedia unavailable
       }
     }
+    applyThemeToDOM('light');
     return 'light';
   });
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    applyThemeToDOM(theme);
     try {
       localStorage.setItem('gridbricks_theme', theme);
     } catch {
-      // Local storage may be restricted in some sandboxed environments
+      // Local storage unavailable
     }
   }, [theme]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setThemeState((prev) => {
+      const next: Theme = prev === 'dark' ? 'light' : 'dark';
+      applyThemeToDOM(next);
+      return next;
+    });
   };
 
   const setTheme = (t: Theme) => {
+    applyThemeToDOM(t);
     setThemeState(t);
   };
 
@@ -63,4 +90,3 @@ export const useTheme = (): ThemeContextType => {
   }
   return context;
 };
-
