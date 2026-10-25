@@ -388,12 +388,85 @@ Signed Errors (Forecast - Actual):
 | `/api/meta` | GET | None | `{"start_date": "2026-01-01", "end_date": "2026-01-31", "cutoff_options": [...]}` | 500 |
 | `/api/forecast/decision` | GET | `delivery_date` (YYYY-MM-DD), `cutoff` (HH:MM) | `DailyDecisionView` (summary KPIs, 48 series items with P10/P90 bounds) | 422 if invalid date or out of Jan 2026 bounds |
 | `/api/forecast/revisions` | GET | `delivery_date`, `cutoff` | `ForecastRevisionsResponse` (vintages array, decision_vintage flag) | 422 on bad date format |
-| `/api/forecast/what-if` | POST | Body: `{delivery_date, cutoff, customer_demand_mw}` | `{baseline_procurement_mw, conservative_procurement_mw, buffer_mw}` | 422 if demand < 0 |
+| `/api/forecast/what-if` | POST | Body: `{expected_demand_mw, forecast_wind_mw, lower_wind_bound_mw}` | `{baseline_procurement_mw, conservative_procurement_mw, buffer_mw}` | 422 if demand < 0 |
 | `/api/accuracy/summary` | GET | `start_date`, `end_date`, `cutoff` | `AccuracySummary` (MAE, RMSE, Bias, WAPE, P10, P50, P90) | 422 if start > end |
 | `/api/accuracy/daily` | GET | `start_date`, `end_date`, `cutoff` | Array of daily accuracy metrics across month | 422 |
 | `/api/accuracy/by-hour` | GET | `start_date`, `end_date`, `cutoff` | `{hours: [{hour_utc, mae_mw, bias_mw, wape_pct}, ...]}` | 422 |
 | `/api/accuracy/by-horizon` | GET | `start_date`, `end_date`, `cutoff` | `{buckets: [{label, horizon_min_h, mae_mw, bias_mw}, ...]}` | 422 |
 | `/api/accuracy/error-distribution`| GET | `start_date`, `end_date`, `cutoff` | `{histogram: [{bin_left_mw, bin_right_mw, count}], quantiles: {...}}` | 422 |
+
+### 9.4 Frontend Architecture & Component Hierarchy
+
+The frontend is a TypeScript Single Page Application (SPA) structured around commercial trading workflows. It avoids heavyweight global state managers in favor of reactive, server-synchronized queries and component-level props.
+
+#### 9.4.1 Component Tree & Page Hierarchy
+
+```
+App (AppContent)
+│
+├── Navbar (Sticky header, ViewTab state: 'decision' | 'accuracy' | 'revisions')
+│   ├── Logo / Brand & Environment badge
+│   ├── Navigation Tabs (Wind, BarChart3, History icons)
+│   ├── RefreshDataButton (Calls useDataRefresh hook with spinner & status badge)
+│   └── MethodologyButton (Opens MethodologyDrawer overlay)
+│
+├── MethodologyDrawer (Flyout documentation panel)
+│   └── Formal definitions of D-1 cutoffs, Zero Look-Ahead Leakage, and WAPE formulas
+│
+└── Main Content Container (max-w-7xl, responsive padding)
+    │
+    ├── 1. DecisionView (Trading execution cockpit)
+    │   ├── Control Bar (Date picker, D-1 cutoff dropdown, audit timestamp badge)
+    │   ├── KPI Card Grid (Forecast Peak, Avg Expected, Total Volume MWh, Matched Coverage)
+    │   ├── ForecastChart (ComposedChart: Forecast line, Actuals line, P10-P90 Area band)
+    │   ├── WhatIfWidget (Scenario sizing: demand input -> baseline & conservative buffer)
+    │   └── HalfHourlyTable (48 SP schedule, All vs Hourly filter, CSV download button)
+    │
+    ├── 2. AccuracyView (Historical benchmark & risk scorecards)
+    │   ├── Date Range & Cutoff Filter Bar
+    │   ├── Trader Guidance Callout (Plain-English summary of month bias and recommended buffer)
+    │   ├── Risk KPI Grid (MAE, RMSE, Mean Bias badge, WAPE %, P90 Tail Risk)
+    │   ├── Diagnostic Grid (2x2 layout):
+    │   │   ├── DailyErrorChart (Bar & line trend across January)
+    │   │   ├── HourOfDayChart (Diurnal cycle: 00:00 to 23:00 UTC)
+    │   │   ├── HorizonChart (Accuracy degradation by lead time buckets)
+    │   │   └── ErrorHistogram (Signed error frequency with P10, P50, P90 quantile chips)
+    │
+    └── 3. RevisionsView (Model evolution & audit fan chart)
+        ├── Summary Header (Total vintages count, decision vintage timestamp)
+        ├── Quick Toggle Action Bar ("Select All", "Decision Run Only", bulk clear)
+        ├── Vintage Selection Pills (Scrollable interactive filter chips for all 32 runs)
+        └── RevisionsChart (Multi-vintage fan chart with connectNulls and decision highlighting)
+```
+
+#### 9.4.2 State Management & Data Fetching Strategy
+
+1. **Server State via TanStack Query (`@tanstack/react-query`):**
+   - Configured in `App.tsx` with `refetchOnWindowFocus: false` and `retry: 1`.
+   - Custom query hooks encapsulated under `frontend/src/api/`:
+     - `useMeta`: Caches available January 2026 dates and cutoff options.
+     - `useDecisionForecast(date, cutoff)`: Keyed by `['forecast', 'decision', date, cutoff]`.
+     - `useWhatIfMutation`: An optimistic mutation posting user demand against current wind bounds.
+     - `useForecastRevisions(date, cutoff)`: Queries the 32 model updates.
+     - `useAccuracySummary`, `useDailyAccuracy`, `useHourlyAccuracy`, `useHorizonAccuracy`, `useErrorDistribution`: Parallelized queries for dashboard rendering.
+2. **Asynchronous Cache Invalidation (`useDataRefresh`):**
+   - Provides a non-blocking `refreshData()` function that executes `queryClient.invalidateQueries()`, tracks `isRefreshing` animation states, and gracefully handles network timeouts.
+3. **HTTP Client (`client.ts`):**
+   - Implements `getApiUrl(path)` dynamically resolving `VITE_API_BASE_URL`.
+   - In production (Docker / Render), defaults to relative `/api/...` calls to run under same-origin routing.
+   - Throws structured errors parsing `{ detail: string }` from FastAPI responses.
+
+#### 9.4.3 Shared UI Components & Utilities
+
+- **`KpiCard.tsx`:** Standardized card container with semantic colored pill badges (`positive`, `warning`, `danger`, `neutral`), truncation safety, and subtitle explanations.
+- **`CsvDownloadButton.tsx`:** Generates clean, RFC-4180 compliant CSV strings directly in the browser and triggers an instantaneous browser download without backend roundtrips.
+- **`LoadingSkeleton.tsx` & `ErrorState.tsx`:** Consistent loading skeletons (animated pulse shimmer) and error recovery callouts with automatic retry buttons.
+- **`formatters.ts`:** Domain-specific number formatters tested in `formatters.test.ts`:
+  - `formatMW(val)`: Formats megawatts with commas and units (e.g. `12,450 MW`).
+  - `formatMWh(val)`: Formats energy volume in gigawatt-hours or megawatt-hours.
+  - `formatSignedMW(val)`: Enforces directional signs (e.g. `+1,851.9 MW` vs `-544.1 MW`).
+  - `formatPercentAbs(val)`: Formats percentages cleanly for WAPE and MAPE.
+  - `formatLondonDateTime(isoStr)`: Converts UTC timestamps to formatted UK trading strings.
 
 ---
 
