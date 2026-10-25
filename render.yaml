@@ -13,3 +13,4 @@ services:
         value: production
       - key: DATA_DIR
         value: backend/data
+
