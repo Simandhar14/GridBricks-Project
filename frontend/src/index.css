@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply antialiased bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100;
+    @apply antialiased bg-slate-50 text-slate-800;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }

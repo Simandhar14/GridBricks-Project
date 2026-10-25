@@ -19,18 +19,18 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   icon,
 }) => {
   const badgeClasses = {
-    neutral: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-    positive: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-    warning: 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
-    danger: 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+    neutral: 'bg-slate-100 text-slate-700 border-slate-200',
+    positive: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    warning: 'bg-amber-50 text-amber-700 border-amber-200',
+    danger: 'bg-rose-50 text-rose-700 border-rose-200',
   }[badge?.variant || 'neutral'];
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between min-w-0">
+    <div className="bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between min-w-0">
       {/* Top Header: Title on Left, Badge & Icon on Right */}
       <div className="flex items-center justify-between gap-2">
         <span
-          className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate"
+          className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500 truncate"
           title={title}
         >
           {title}
@@ -43,21 +43,21 @@ export const KpiCard: React.FC<KpiCardProps> = ({
               {badge.text}
             </span>
           )}
-          {icon && <div className="text-slate-400 dark:text-slate-500 shrink-0">{icon}</div>}
+          {icon && <div className="text-slate-400 shrink-0">{icon}</div>}
         </div>
       </div>
 
       {/* Main Metric Value: Full Width, No Awkward Wrap */}
       <div className="mt-2.5">
         <div
-          className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis"
+          className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 whitespace-nowrap overflow-hidden text-ellipsis"
           title={value}
         >
           {value}
         </div>
 
         {subtext && (
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2" title={subtext}>
+          <p className="mt-1 text-xs text-slate-500 leading-relaxed line-clamp-2" title={subtext}>
             {subtext}
           </p>
         )}

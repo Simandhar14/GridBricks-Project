@@ -11,23 +11,20 @@ import {
 } from 'recharts';
 import { HorizonAccuracyItem } from '../../types/api';
 import { formatMW, formatSignedMW } from '../../utils/formatters';
-import { useTheme } from '../../context/ThemeContext';
 
 interface HorizonChartProps {
   data: HorizonAccuracyItem[];
 }
 
 export const HorizonChart: React.FC<HorizonChartProps> = ({ data }) => {
-  const { isDark } = useTheme();
-
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-200">
+    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+          <h3 className="text-sm font-bold text-slate-900 tracking-tight">
             Error vs. Lead Horizon (Lead-Time Degradation)
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             How forecast accuracy degrades as lead time increases (0–6h to 48h+)
           </p>
         </div>
@@ -36,19 +33,15 @@ export const HorizonChart: React.FC<HorizonChartProps> = ({ data }) => {
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke={isDark ? '#334155' : '#f1f5f9'}
-              vertical={false}
-            />
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
             <XAxis
               dataKey="label"
-              stroke={isDark ? '#64748b' : '#94a3b8'}
+              stroke="#94a3b8"
               fontSize={11}
               tickLine={false}
             />
             <YAxis
-              stroke={isDark ? '#64748b' : '#94a3b8'}
+              stroke="#94a3b8"
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -77,26 +70,24 @@ export const HorizonChart: React.FC<HorizonChartProps> = ({ data }) => {
 
 const HorizonTooltip = ({ active, payload }: any) => {
   if (!active || !payload || !payload.length) return null;
-  const b: HorizonAccuracyItem = payload[0].payload;
+  const item: HorizonAccuracyItem = payload[0].payload;
 
   return (
     <div className="bg-slate-900/95 text-white p-3 rounded-xl shadow-lg border border-slate-800 text-xs space-y-1 min-w-[170px]">
       <div className="font-semibold text-slate-200 border-b border-slate-700 pb-1">
-        Lead Horizon: {b.label}
+        Horizon: {item.label}
       </div>
       <div className="flex justify-between text-sky-400">
         <span>MAE:</span>
-        <span className="font-mono font-bold">{formatMW(b.mae_mw)}</span>
+        <span className="font-mono font-bold">{formatMW(item.mae_mw)}</span>
       </div>
       <div className="flex justify-between text-amber-400">
-        <span>Bias:</span>
-        <span className="font-mono font-bold">{formatSignedMW(b.bias_mw)}</span>
+        <span>Mean Bias:</span>
+        <span className="font-mono font-bold">{formatSignedMW(item.bias_mw)}</span>
       </div>
-      <div className="flex justify-between text-slate-400 text-[11px] pt-0.5 border-t border-slate-800">
-        <span>Evaluated Points:</span>
-        <span className="font-mono">{b.n_points}</span>
+      <div className="text-[10px] text-slate-400 pt-0.5">
+        Sample Points: {item.n_points} half-hours
       </div>
     </div>
   );
 };
-

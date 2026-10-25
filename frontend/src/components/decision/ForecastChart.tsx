@@ -11,8 +11,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { DecisionHalfHour } from '../../types/api';
-import { formatLondonDateTime, formatMW, formatTimeOnly } from '../../utils/formatters';
-import { useTheme } from '../../context/ThemeContext';
+import { formatMW, formatTimeOnly } from '../../utils/formatters';
 
 interface ForecastChartProps {
   data: DecisionHalfHour[];
@@ -33,8 +32,6 @@ interface ChartItem {
 }
 
 export const ForecastChart: React.FC<ForecastChartProps> = ({ data }) => {
-  const { isDark } = useTheme();
-
   const chartData: ChartItem[] = React.useMemo(() => {
     return data.map((h) => {
       const lower = h.implied_actual_lower_mw;
@@ -58,28 +55,28 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-200">
+    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+          <h3 className="text-sm font-bold text-slate-900 tracking-tight">
             Decision-Time Forecast vs. Actual Generation
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Shaded envelope denotes the historical empirical P10–P90 implied actual range
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs shrink-0">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-0.5 bg-sky-600 dark:bg-sky-400 inline-block" />
-            <span className="text-slate-600 dark:text-slate-300 font-medium">Decision Forecast</span>
+            <span className="w-3 h-0.5 bg-sky-600 inline-block" />
+            <span className="text-slate-600 font-medium">Decision Forecast</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-0.5 bg-slate-900 dark:bg-slate-100 inline-block" />
-            <span className="text-slate-600 dark:text-slate-300 font-medium">Actuals</span>
+            <span className="w-3 h-0.5 bg-slate-900 inline-block" />
+            <span className="text-slate-600 font-medium">Actuals</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-2 bg-sky-100 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-700 rounded inline-block" />
-            <span className="text-slate-600 dark:text-slate-300 font-medium">P10–P90 Band</span>
+            <span className="w-3 h-2 bg-sky-100 border border-sky-300 rounded inline-block" />
+            <span className="text-slate-600 font-medium">P10–P90 Band</span>
           </div>
         </div>
       </div>
@@ -87,20 +84,16 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ data }) => {
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke={isDark ? '#334155' : '#f1f5f9'}
-              vertical={false}
-            />
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
             <XAxis
               dataKey="timeStr"
-              stroke={isDark ? '#64748b' : '#94a3b8'}
+              stroke="#94a3b8"
               fontSize={11}
               tickLine={false}
               interval={3}
             />
             <YAxis
-              stroke={isDark ? '#64748b' : '#94a3b8'}
+              stroke="#94a3b8"
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -120,10 +113,10 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ data }) => {
             <Area
               dataKey="band_range"
               stackId="band"
-              stroke={isDark ? '#0284c7' : '#7dd3fc'}
+              stroke="#7dd3fc"
               strokeDasharray="2 2"
-              fill={isDark ? '#0369a1' : '#e0f2fe'}
-              fillOpacity={isDark ? 0.25 : 0.6}
+              fill="#e0f2fe"
+              fillOpacity={0.6}
               name="P10–P90 Range"
               isAnimationActive={false}
             />
@@ -133,21 +126,21 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ data }) => {
               type="monotone"
               dataKey="forecast_mw"
               name="Forecast"
-              stroke={isDark ? '#38bdf8' : '#0284c7'}
+              stroke="#0284c7"
               strokeWidth={2.5}
-              dot={{ r: 2.5, fill: isDark ? '#38bdf8' : '#0284c7' }}
+              dot={{ r: 2.5, fill: '#0284c7' }}
               activeDot={{ r: 5 }}
-              connectNulls={false}
+              connectNulls={true}
             />
             <Line
               type="monotone"
               dataKey="actual_mw"
               name="Actual"
-              stroke={isDark ? '#f8fafc' : '#0f172a'}
+              stroke="#0f172a"
               strokeWidth={2}
-              dot={{ r: 2, fill: isDark ? '#f8fafc' : '#0f172a' }}
+              dot={{ r: 2, fill: '#0f172a' }}
               activeDot={{ r: 5 }}
-              connectNulls={false}
+              connectNulls={true}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -163,46 +156,51 @@ const CustomTooltip = ({ active, payload }: any) => {
   return (
     <div className="bg-slate-900/95 text-white p-3 rounded-xl shadow-lg border border-slate-800 text-xs space-y-1.5 min-w-[200px]">
       <div className="font-semibold text-slate-200 border-b border-slate-700 pb-1 flex justify-between">
-        <span>{formatLondonDateTime(item.start_time)}</span>
-        <span className="text-slate-400">SP {item.sp}</span>
+        <span>SP {item.sp}</span>
+        <span className="font-mono text-sky-400">{item.timeStr} GMT</span>
       </div>
 
-      <div className="space-y-1 pt-0.5">
+      <div className="space-y-1">
         <div className="flex justify-between items-center text-sky-400">
           <span>Decision Forecast:</span>
           <span className="font-mono font-bold">{formatMW(item.forecast_mw)}</span>
         </div>
 
-        <div className="flex justify-between items-center text-slate-200">
+        <div className="flex justify-between items-center text-slate-300">
           <span>Actual Generation:</span>
-          <span className="font-mono font-bold">{formatMW(item.actual_mw)}</span>
+          <span className="font-mono font-bold">
+            {item.actual_mw !== null ? formatMW(item.actual_mw) : 'Pending (D+)'}
+          </span>
         </div>
 
         {item.error_mw !== null && (
-          <div className="flex justify-between items-center text-slate-300">
+          <div className="flex justify-between items-center pt-1 border-t border-slate-800 text-slate-400">
             <span>Forecast Error:</span>
-            <span className={`font-mono font-bold ${item.error_mw > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+            <span
+              className={`font-mono font-semibold ${
+                item.error_mw > 0 ? 'text-amber-400' : 'text-emerald-400'
+              }`}
+            >
               {item.error_mw > 0 ? `+${item.error_mw} MW` : `${item.error_mw} MW`}
             </span>
           </div>
         )}
 
         {item.lower_bound !== null && item.upper_bound !== null && (
-          <div className="flex justify-between items-center text-sky-200/80 text-[11px] pt-1 border-t border-slate-800">
-            <span>P10–P90 Range:</span>
+          <div className="flex justify-between items-center text-[10px] text-slate-400 pt-0.5">
+            <span>Implied P10–P90:</span>
             <span className="font-mono">
-              {item.lower_bound} – {item.upper_bound} MW
+              {Math.round(item.lower_bound)} – {Math.round(item.upper_bound)} MW
             </span>
           </div>
         )}
 
         {item.horizon_hours !== null && (
-          <div className="text-[10px] text-slate-400 text-right">
-            Lead Horizon: {item.horizon_hours}h
+          <div className="text-[10px] text-slate-500 pt-0.5">
+            Lead horizon: {item.horizon_hours} hours
           </div>
         )}
       </div>
     </div>
   );
 };
-

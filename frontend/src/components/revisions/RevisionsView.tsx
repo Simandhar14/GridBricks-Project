@@ -49,9 +49,20 @@ export const RevisionsView: React.FC<RevisionsViewProps> = ({
   const { vintages, actuals } = data;
   const decisionVintage = vintages.find((v) => v.is_decision_forecast);
 
+  // Compute active states for buttons
+  const isAllSelected =
+    selectedVintages === null ||
+    (vintages.length > 0 && selectedVintages.size === vintages.length);
+
+  const isDecisionOnly =
+    selectedVintages !== null &&
+    selectedVintages.size === 1 &&
+    decisionVintage !== undefined &&
+    selectedVintages.has(decisionVintage.publish_time);
+
   const toggleVintage = (pubTime: string) => {
     setSelectedVintages((prev) => {
-      const next = new Set(prev ? prev : vintages.map((v) => v.publish_time));
+      const next = prev ? new Set(prev) : new Set(vintages.map((v) => v.publish_time));
       if (next.has(pubTime)) {
         next.delete(pubTime);
       } else {
@@ -61,7 +72,10 @@ export const RevisionsView: React.FC<RevisionsViewProps> = ({
     });
   };
 
-  const selectAll = () => setSelectedVintages(null);
+  const selectAll = () => {
+    setSelectedVintages(new Set(vintages.map((v) => v.publish_time)));
+  };
+
   const selectDecisionOnly = () => {
     if (decisionVintage) {
       setSelectedVintages(new Set([decisionVintage.publish_time]));
@@ -71,28 +85,28 @@ export const RevisionsView: React.FC<RevisionsViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header & Controls */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors duration-200">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-base font-bold text-slate-900 tracking-tight">
             Multi-Vintage Forecast Revision History
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Trace successive weather forecast revisions leading up to and after the D-1 decision
           </p>
         </div>
 
         {/* Date & Cutoff Filters */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-300">
-            <Calendar className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <label htmlFor="revisions-date" className="font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700">
+            <Calendar className="w-3.5 h-3.5 text-slate-500" />
+            <label htmlFor="revisions-date" className="font-medium text-slate-500">
               Delivery Day:
             </label>
             <select
               id="revisions-date"
               value={selectedDate}
               onChange={(e) => onChangeDate(e.target.value)}
-              className="bg-transparent font-semibold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-slate-100"
+              className="bg-transparent font-semibold text-slate-900 focus:outline-none cursor-pointer"
             >
               {availableDates.map((d) => (
                 <option key={d} value={d}>
@@ -102,16 +116,16 @@ export const RevisionsView: React.FC<RevisionsViewProps> = ({
             </select>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-300">
-            <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <label htmlFor="revisions-cutoff" className="font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700">
+            <Clock className="w-3.5 h-3.5 text-slate-500" />
+            <label htmlFor="revisions-cutoff" className="font-medium text-slate-500">
               D-1 Cutoff:
             </label>
             <select
               id="revisions-cutoff"
               value={selectedCutoff}
               onChange={(e) => onChangeCutoff(e.target.value)}
-              className="bg-transparent font-semibold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-slate-100"
+              className="bg-transparent font-semibold text-slate-900 focus:outline-none cursor-pointer"
             >
               {cutoffOptions.map((c) => (
                 <option key={c} value={c}>
@@ -156,26 +170,36 @@ export const RevisionsView: React.FC<RevisionsViewProps> = ({
       />
 
       {/* Vintage Filter Pills */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-3 transition-colors duration-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
               Filter Model Vintages ({vintages.length} runs)
             </h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-slate-500">
               Toggle specific publication times to inspect how projections evolved
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs">
             <button
+              type="button"
               onClick={selectAll}
-              className="px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:hover:bg-slate-700 rounded transition-colors font-medium border border-transparent dark:border-slate-700"
+              className={`px-3 py-1.5 rounded-lg transition-all font-semibold shadow-xs ${
+                isAllSelected
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+              }`}
             >
-              Select All
+              Select All ({vintages.length})
             </button>
             <button
+              type="button"
               onClick={selectDecisionOnly}
-              className="px-2.5 py-1 text-sky-700 dark:text-sky-300 hover:text-sky-900 dark:hover:text-white bg-sky-50 dark:bg-sky-950/80 hover:bg-sky-100 dark:hover:bg-sky-900 border border-sky-200 dark:border-sky-800 rounded transition-colors font-medium"
+              className={`px-3 py-1.5 rounded-lg transition-all font-semibold shadow-xs ${
+                isDecisionOnly
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+              }`}
             >
               Decision Run Only
             </button>
@@ -187,16 +211,17 @@ export const RevisionsView: React.FC<RevisionsViewProps> = ({
             const isVisible = selectedVintages ? selectedVintages.has(v.publish_time) : true;
             return (
               <button
+                type="button"
                 key={v.publish_time}
                 onClick={() => toggleVintage(v.publish_time)}
                 className={`text-xs px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5 ${
                   v.is_decision_forecast
                     ? isVisible
-                      ? 'bg-sky-600 dark:bg-sky-500 text-white border-sky-600 dark:border-sky-500 shadow-sm font-bold'
-                      : 'bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800 opacity-60'
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-bold'
+                      : 'bg-sky-50 text-sky-700 border-sky-300 opacity-60'
                     : isVisible
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800 opacity-50'
+                    ? 'bg-slate-100 text-slate-800 border-slate-300 hover:bg-slate-200 font-medium'
+                    : 'bg-white text-slate-400 border-slate-200 opacity-50'
                 }`}
               >
                 <span>{formatLondonDateTime(v.publish_time)}</span>
@@ -213,4 +238,3 @@ export const RevisionsView: React.FC<RevisionsViewProps> = ({
     </div>
   );
 };
-

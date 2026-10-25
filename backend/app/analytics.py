@@ -751,10 +751,11 @@ def get_forecast_revisions(
     end_utc = start_utc + timedelta(days=1)
     cutoff_utc = get_decision_cutoff_utc(d, cutoff_time_local)
 
-    # Filter forecasts for day D
+    # Filter forecasts for day D and expand hourly WINDFOR forecasts across both half-hours
     f_day = forecasts_df[
         (forecasts_df["start_time"] >= start_utc) & (forecasts_df["start_time"] < end_utc)
     ]
+    f_day = expand_hourly_to_half_hourly(f_day)
 
     # Actuals for day D
     a_day = actuals_df[
